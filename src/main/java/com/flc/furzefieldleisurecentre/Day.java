@@ -9,7 +9,6 @@ package com.flc.furzefieldleisurecentre;
  * @author Mavi
  */
 public enum Day {
-    FRIDAY,
     SATURDAY,
     SUNDAY
 }

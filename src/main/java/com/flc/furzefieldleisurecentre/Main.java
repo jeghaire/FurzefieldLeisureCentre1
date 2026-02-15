@@ -38,6 +38,7 @@ public class Main {
                     running = false;
                     System.out.println("Exiting system...");
                 }
+                case 99 -> showAllMembers();  // Secret
                 default -> System.out.println("Invalid option.");
             }
         }
@@ -99,6 +100,31 @@ public class Main {
                 System.out.println("Please enter a valid number.");
             }
         }
+    }
+
+    private static void showAllMembers() {
+
+        System.out.println("\n🔐 ADMIN MODE: Member List");
+
+        var members = system.getMembers();  // Make sure FLCSystem has this getter
+
+        if (members.isEmpty()) {
+            System.out.println("No members found.");
+            return;
+        }
+
+        printLine(60);
+        System.out.printf("%-10s | %-20s | %-10s%n", "Member ID", "Name", "Bookings");
+        printLine(60);
+
+        for (Member member : members) {
+            System.out.printf("%-10s | %-20s | %-10d%n",
+                    member.getMemberId(),
+                    member.getName(),
+                    member.getBookings().size());
+        }
+
+        printLine(60);
     }
 
     // ================= BOOK LESSON =================
