@@ -6,7 +6,6 @@ package com.flc.furzefieldleisurecentre;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  *
@@ -50,22 +49,6 @@ public class FLCSystem {
         return null;
     }
 
-    // ✅ Book lesson
-    public Booking bookLesson(String memberId, String lessonId) {
-
-      Member member = findMemberById(memberId);
-      if (member == null) return null;
-
-      Lesson lesson = findLessonById(lessonId);
-      if (lesson == null) return null;
-
-      String bookingId = "B" + UUID.randomUUID().toString().substring(0, 6);
-
-      boolean success = member.bookLesson(bookingId, lesson);
-
-      return success ? member.findBookingById(bookingId) : null;
-  }
-
     // ✅ Find lesson by ID
     public Lesson findLessonById(String lessonId) {
 
@@ -78,11 +61,4 @@ public class FLCSystem {
         return null;
     }
 
-    public boolean hasMember(String memberId) {
-        return findMemberById(memberId) != null;
-    }
-
-    public boolean hasLesson(String lessonId) {
-        return findLessonById(lessonId) != null;
-    }
 }

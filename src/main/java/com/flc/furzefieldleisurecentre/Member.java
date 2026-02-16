@@ -35,40 +35,6 @@ public class Member {
         return bookings;
     }
 
-    // ✅ Book a lesson
-    public boolean bookLesson(String bookingId, Lesson lesson) {
-
-        if (hasDuplicateBooking(lesson)) {
-            return false; // Duplicate not allowed
-        }
-
-        if (!lesson.hasSpace()) {
-            return false; // No capacity
-        }
-
-        Booking booking = new Booking(bookingId, this, lesson);
-
-        boolean added = lesson.addBooking(booking);
-
-        if (added) {
-            bookings.add(booking);
-            return true;
-        }
-
-        return false;
-    }
-
-    // ✅ Check duplicate booking
-    private boolean hasDuplicateBooking(Lesson lesson) {
-        for (Booking booking : bookings) {
-            if (booking.getLesson().equals(lesson)
-                    && booking.getStatus() != BookingStatus.CANCELLED) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     // ✅ Find booking by ID
     public Booking findBookingById(String bookingId) {
         for (Booking booking : bookings) {
