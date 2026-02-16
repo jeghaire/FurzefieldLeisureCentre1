@@ -77,4 +77,12 @@ public class FLCSystem {
 
         return null;
     }
+
+    public boolean hasMember(String memberId) {
+        return findMemberById(memberId) != null;
+    }
+
+    public boolean hasLesson(String lessonId) {
+        return findLessonById(lessonId) != null;
+    }
 }
