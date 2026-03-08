@@ -32,9 +32,37 @@ public class Booking {
     public int getRating() { return rating; }
     public String getReview() { return review; }
 
-    // SETTERS for BookingService
-    public void setLesson(Lesson lesson) { this.lesson = lesson; }
-    public void setStatus(BookingStatus status) { this.status = status; }
-    public void setRating(int rating) { this.rating = rating; }
-    public void setReview(String review) { this.review = review; }
+    // =========================
+    // DOMAIN BEHAVIOR METHODS
+    // =========================
+
+    public boolean changeLesson(Lesson newLesson) {
+        if (status == BookingStatus.CANCELLED || status == BookingStatus.ATTENDED) {
+            return false;
+        }
+        this.lesson = newLesson;
+        return true;
+    }
+
+    public boolean cancel() {
+        if (status == BookingStatus.CANCELLED || status == BookingStatus.ATTENDED) {
+            return false;
+        }
+        status = BookingStatus.CANCELLED;
+        return true;
+    }
+
+    public boolean attend(int rating, String review) {
+        if (status != BookingStatus.BOOKED) {
+            return false;
+        }
+        if (rating < 1 || rating > 5) {
+            return false;
+        }
+
+        this.rating = rating;
+        this.review = review;
+        this.status = BookingStatus.ATTENDED;
+        return true;
+    }
 }

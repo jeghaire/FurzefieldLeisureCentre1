@@ -18,9 +18,10 @@ public class BookingService {
         Lesson lesson = system.findLessonById(lessonId);
         if (lesson == null) return null;
 
-        // Prevent duplicate booking
         boolean alreadyBooked = member.getBookings().stream()
-                .anyMatch(b -> b.getLesson().equals(lesson) && b.getStatus() != BookingStatus.CANCELLED);
+                .anyMatch(b -> b.getLesson().equals(lesson)
+                        && b.getStatus() != BookingStatus.CANCELLED);
+
         if (alreadyBooked) {
             System.out.println("Member already has a booking for this lesson.");
             return null;
@@ -31,9 +32,13 @@ public class BookingService {
             return null;
         }
 
-        String bookingId = "B" + UUID.randomUUID().toString().replace("-", "").substring(0, 6);
+        String bookingId = "B" + UUID.randomUUID()
+                .toString()
+                .replace("-", "")
+                .substring(0, 6);
 
         Booking booking = new Booking(bookingId, member, lesson);
+
         lesson.addBooking(booking);
         member.getBookings().add(booking);
 
@@ -45,82 +50,36 @@ public class BookingService {
         Lesson newLesson = system.findLessonById(newLessonId);
         if (newLesson == null) return false;
 
-        if (booking.getStatus() == BookingStatus.CANCELLED || booking.getStatus() == BookingStatus.ATTENDED) {
-            return false;
-        }
-
-        if (booking.getLesson().equals(newLesson)) {
-            System.out.println("Booking is already for this lesson.");
-            return false;
-        }
-
         if (!newLesson.hasSpace()) {
             System.out.println("New lesson is full.");
             return false;
         }
 
-        booking.getLesson().removeBooking(booking);
-        newLesson.addBooking(booking);
-
-        // Update booking reference via reflection
-        try {
-            java.lang.reflect.Field lessonField = Booking.class.getDeclaredField("lesson");
-            lessonField.setAccessible(true);
-            lessonField.set(booking, newLesson);
-        } catch (Exception e) {
-            System.out.println("⚠ Error updating booking lesson: " + e.getMessage());
+        if (booking.getLesson().equals(newLesson)) {
+            System.out.println("Booking already for this lesson.");
             return false;
         }
 
-        return true;
+        // Remove from old lesson
+        booking.getLesson().removeBooking(booking);
+
+        // Add to new lesson
+        newLesson.addBooking(booking);
+
+        return booking.changeLesson(newLesson);
     }
 
     public boolean cancelBooking(Booking booking) {
 
-        if (booking.getStatus() == BookingStatus.CANCELLED || booking.getStatus() == BookingStatus.ATTENDED) {
+        if (!booking.cancel()) {
             return false;
         }
 
         booking.getLesson().removeBooking(booking);
-
-        try {
-            java.lang.reflect.Field statusField = Booking.class.getDeclaredField("status");
-            statusField.setAccessible(true);
-            statusField.set(booking, BookingStatus.CANCELLED);
-        } catch (Exception e) {
-            System.out.println("⚠ Error updating booking status: " + e.getMessage());
-            return false;
-        }
-
         return true;
     }
 
     public boolean attendLesson(Booking booking, int rating, String review) {
-
-        if (booking.getStatus() != BookingStatus.BOOKED) {
-            return false;
-        }
-
-        if (rating < 1 || rating > 5) return false;
-
-        try {
-            java.lang.reflect.Field ratingField = Booking.class.getDeclaredField("rating");
-            ratingField.setAccessible(true);
-            ratingField.set(booking, rating);
-
-            java.lang.reflect.Field reviewField = Booking.class.getDeclaredField("review");
-            reviewField.setAccessible(true);
-            reviewField.set(booking, review);
-
-            java.lang.reflect.Field statusField = Booking.class.getDeclaredField("status");
-            statusField.setAccessible(true);
-            statusField.set(booking, BookingStatus.ATTENDED);
-
-        } catch (Exception e) {
-            System.out.println("⚠ Error attending lesson: " + e.getMessage());
-            return false;
-        }
-
-        return true;
+        return booking.attend(rating, review);
     }
 }
